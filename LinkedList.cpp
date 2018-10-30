@@ -23,7 +23,6 @@ class LinkedLst{
 };
 
 void LinkedLst::Insert(char* name,int data){
-    cout << name << " " << data << endl;
     node *temp = (struct node*)malloc(sizeof(struct node));
     node *prev = NULL,*cur=NULL;
     temp->name = new char[strlen(name)];
@@ -37,7 +36,7 @@ void LinkedLst::Insert(char* name,int data){
     else{
         cur = this->head;
         while(cur!=NULL){
-            if(cur->data < data){
+            if(cur->data <= data){
                 prev = cur;
                 cur = cur->next;
             }
@@ -50,7 +49,7 @@ void LinkedLst::Insert(char* name,int data){
         if(cur == NULL)
             prev->next = temp;
     }
-    cout << strlen(name) << endl;
+    this->length++;
 }
 
 LinkedLst::LinkedLst(){
@@ -69,42 +68,45 @@ LinkedLst::~LinkedLst(){
 }
 
 void LinkedLst::Remove(int pos){
-    if(IsEmpty() && pos > this->length)
-        cout << "Invalid Records" << endl;
+    if(IsEmpty() || pos > this->length || pos==0)
+        cout << "Error while removing records" << endl;
     else{
-        int pos_count=0;
+        int pos_count=2;
         struct node* temp = NULL,*temp1;
         temp = this->head;
-        if(pos=0){
-            this->head = this->head->next;
+        if(pos==1){
+            this->head = temp->next;
             delete temp;
         }
         else{
             while(temp!=NULL){
-                if(pos_count == pos-1){
+                if(pos_count == pos){
                     temp1 = temp->next;
                     temp->next = temp1->next;
+                    temp1->next = NULL;
                     delete temp1;
                     break;
                 }
+                temp = temp->next;
                 pos_count++;
             }
         }
+    this->length--;
     }
 }
 
 bool LinkedLst::IsEmpty(){
-    return this->length ? false : true;
+    return (this->length==0) ? true : false;
 }
 
 void LinkedLst::Print(int pos){
-    if(IsEmpty() && pos > this->length)
-        cout << "Invalid Records" << endl;
+    if(IsEmpty() || pos > this->length || pos==0)
+        cout << "Error while printing records" << endl;
     else{
         int pos_count=0;
         struct node* cur = this->head;
-        while(cur!=NULL && pos_count<=pos){
-            cout << cur->name << cur->data << endl;
+        while(cur!=NULL && pos_count<pos){
+            cout << cur->name << '\t' << cur->data << endl;
             cur = cur->next;
             pos_count++;
         }
@@ -113,34 +115,26 @@ void LinkedLst::Print(int pos){
 
 int main(int argc,char** argv){
     LinkedLst *lst = new LinkedLst();
-    char *input,*cmd,*par1,*par2;
+    char *cmd,*par1;
     int N;
     do{
-        input = new char[40];
-        par1 = new char[30];
-        par2 = new char[10];
         delete[] cmd;
         cmd = new char[7];
-        cin.getline(input,40);
-        cmd = strtok(input," ");
+        cin >> cmd;
         if(strcmp(cmd,"insert")==0){
-            par1 = strtok(NULL," ");
-            par2 = strtok(NULL," ");
-            N = atoi(par2);
+            par1 = new char[30];
+            cin >> par1 >> N;
             lst->Insert(par1,N);
+            delete[] par1;
         }
         else if(strcmp(cmd,"remove")==0){
-            par1 = strtok(input," ");
-            N = atoi(par1);
+            cin >> N;
             lst->Remove(N);
         }
         else if(strcmp(cmd,"print")==0){
-            par1 = strtok(input," ");
-            N = atoi(par1);
+            cin >> N;
             lst->Print(N);
         }
-        delete[] input;
-        delete[] par1;
-        delete[] par2;
+        cin.ignore(250,'\n');
     }while(strcmp(cmd,"stop")!=0);
 }
